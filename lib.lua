@@ -104,6 +104,21 @@ local settings = ns.settings
 		return condition
 	end
 
+	--[[
+	
+	]]
+	lib.Proxify = function(button)
+		local bname = button:GetName()
+		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
+			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
+			button.SetSize = lib.noop										-- don't do this anymore!
+		end
+		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
+			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
+			button.SetPoint = lib.noop										-- don't do this anymore!
+		end
+	end
+
 -- ########################################################################################################
 
 	--[[
@@ -355,18 +370,10 @@ local settings = ns.settings
 	]]
 	lib.HandleButtonBar = function(parent, key, sizeX, sizeY)
 		-- lib.debugging('HandleButtonBar() '..key..', '..settings.static.NumButtons[key]..', '..PredatorButtonsSettings[key].buttons)
-		local i, button, bname
+		local i, button
 		for i = 1, settings.static.NumButtons[key] do
 			button = _G[settings.static.ButtonPrefix[key]..i]
-			bname = button:GetName()
-			if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-				lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-				button.SetSize = lib.noop										-- don't do this anymore!
-			end
-			if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-				lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-				button.SetPoint = lib.noop										-- don't do this anymore!
-			end
+			lib.Proxify(button)
 			if ( i <= PredatorButtonsSettings[key].buttons ) then				-- magic happening here!
 				if ( i == 1 ) then
 					lib.MoveButton(button, 
@@ -386,7 +393,7 @@ local settings = ns.settings
 			else
 				button:ClearAllPoints()
 				-- button:SetPoint('BOTTOMRIGHT', UIParent, 'TOPLEFT', -5, 5)		-- out of sight, out of mind!
-				lib.buttonFuncProxy[bname..'SetPoint'](button, 'BOTTOMRIGHT', UIParent, 'TOPLEFT', -5, 5)
+				lib.buttonFuncProxy[button:GetName()..'SetPoint'](button, 'BOTTOMRIGHT', UIParent, 'TOPLEFT', -5, 5)
 			end
 		end
 	end
@@ -431,20 +438,12 @@ local settings = ns.settings
 		_G['MultiCastActionPage2']:SetParent(f)
 		_G['MultiCastActionPage3']:SetParent(f)
 
-		local button, bname, i
+		local button, i
 
 		i = 1
 		button = _G['MultiCastSummonSpellButton']
 		button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -457,15 +456,7 @@ local settings = ns.settings
 		button = _G['MultiCastSlotButton1']
 		button:SetParent(f)
 		button.SetParent = lib.noop
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -474,16 +465,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton1']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -492,16 +474,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton5']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -510,16 +483,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton9']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -531,15 +495,7 @@ local settings = ns.settings
 		i = 3
 		button = _G['MultiCastSlotButton2']
 		button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -548,16 +504,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton2']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -566,16 +513,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton6']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -584,16 +522,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton10']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -605,15 +534,7 @@ local settings = ns.settings
 		i = 4
 		button = _G['MultiCastSlotButton3']
 		button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -622,16 +543,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton3']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -640,16 +552,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton7']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -658,16 +561,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton11']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -679,15 +573,7 @@ local settings = ns.settings
 		i = 5
 		button = _G['MultiCastSlotButton4']
 		button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -696,16 +582,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton4']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -714,16 +591,7 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton8']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
@@ -732,16 +600,19 @@ local settings = ns.settings
 			} )
 
 		button = _G['MultiCastActionButton12']
-		-- button:SetParent(f)
-		bname = button:GetName()
-		if ( not lib.buttonFuncProxy[bname..'SetSize'] ) then
-			lib.buttonFuncProxy[bname..'SetSize'] = button.SetSize
-			button.SetSize = lib.noop										-- don't do this anymore!
-		end
-		if ( not lib.buttonFuncProxy[bname..'SetPoint'] ) then
-			lib.buttonFuncProxy[bname..'SetPoint'] = button.SetPoint
-			button.SetPoint = lib.noop										-- don't do this anymore!
-		end
+		lib.Proxify(button)
+		lib.MoveButton(button, 
+			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
+			{'TOPLEFT', f, 'TOPLEFT', 
+				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
+				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
+			} )
+
+-- #######################################################################
+		i = 6
+		button = _G['MultiCastRecallSpellButton']
+		button:SetParent(f)
+		lib.Proxify(button)
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
