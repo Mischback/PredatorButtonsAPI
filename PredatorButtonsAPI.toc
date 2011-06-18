@@ -1,0 +1,10 @@
+## Interface: 40100
+## Title: PredatorButtonsAPI
+## Author: Mischback
+## Version: 1.0
+## DefaultState: disabled
+## SavedVariablesPerCharacter: PredatorButtonsSettings
+
+settings.lua
+lib.lua
+core.lua
