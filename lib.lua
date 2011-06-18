@@ -104,8 +104,8 @@ local settings = ns.settings
 		return condition
 	end
 
-	--[[
-	
+	--[[ VOID Proxify(FRAME button)
+		Stores the SetSize() and SetPoint() functions of a button.
 	]]
 	lib.Proxify = function(button)
 		local bname = button:GetName()
@@ -375,21 +375,12 @@ local settings = ns.settings
 			button = _G[settings.static.ButtonPrefix[key]..i]
 			lib.Proxify(button)
 			if ( i <= PredatorButtonsSettings[key].buttons ) then				-- magic happening here!
-				if ( i == 1 ) then
-					lib.MoveButton(button, 
-						sizeX, sizeY,
-						{'TOPLEFT', parent, 'TOPLEFT', 
-							PredatorButtonsSettings[key].padding, 
-							-PredatorButtonsSettings[key].padding
-						} )
-				else
-					lib.MoveButton(button,
-						sizeX, sizeY,
-						{'TOPLEFT', parent, 'TOPLEFT', 
-							( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-							-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-						} )
-				end
+				lib.MoveButton(button,
+					sizeX, sizeY,
+					{'TOPLEFT', parent, 'TOPLEFT', 
+						( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
+						-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
+					} )
 			else
 				button:ClearAllPoints()
 				-- button:SetPoint('BOTTOMRIGHT', UIParent, 'TOPLEFT', -5, 5)		-- out of sight, out of mind!
@@ -447,8 +438,8 @@ local settings = ns.settings
 		lib.MoveButton(button, 
 			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
 			{'TOPLEFT', f, 'TOPLEFT', 
-				PredatorButtonsSettings[key].padding, 
-				-PredatorButtonsSettings[key].padding
+				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
+				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
 			} )
 
 -- #######################################################################
