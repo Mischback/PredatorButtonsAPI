@@ -40,6 +40,7 @@ local settings = ns.settings
 		lib.CreateMover('MultiBarLeft')
 		lib.CreateMover('PetBar')
 		lib.CreateMover('StanceBar')
+		lib.CreateTotemMover()
 	end
 
 	--[[ Controls what happens while using a slash-command
@@ -59,6 +60,7 @@ local settings = ns.settings
 				_G['PredatorButtonsMultiBarLeftMover']:Hide()
 				_G['PredatorButtonsPetBarMover']:Hide()
 				_G['PredatorButtonsStanceBarMover']:Hide()
+				_G['PredatorButtonsTotemBarMover']:Hide()
 			elseif ( not _G['PredatorButtonsActionBarMover']:IsShown() ) then
 				_G['PredatorButtonsActionBarMover']:Show()
 				_G['PredatorButtonsMultiBarBottomLeftMover']:Show()
@@ -67,6 +69,7 @@ local settings = ns.settings
 				_G['PredatorButtonsMultiBarLeftMover']:Show()
 				_G['PredatorButtonsPetBarMover']:Show()
 				_G['PredatorButtonsStanceBarMover']:Show()
+				_G['PredatorButtonsTotemBarMover']:Show()
 			end
 		end
 	end
@@ -256,6 +259,146 @@ local settings = ns.settings
 		return f
 	end
 
+	--[[
+	
+	]]
+	lib.CreateTotemMover = function()
+		local key = 'TotemBar'
+		local f = CreateFrame('Frame', settings.static.BarName[key]..'Mover', UIParent)
+		f:SetAllPoints(_G[settings.static.BarName[key]])
+		f:SetFrameLevel(_G['MultiCastSummonSpellButton']:GetFrameLevel()+50)
+		f:EnableMouse(true)
+
+		f.tex = f:CreateTexture(nil, 'BACKGROUND')
+		f.tex:SetAllPoints(f)
+		f.tex:SetTexture(0, 1, 0, 0.5)
+
+		f.caption = f:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+		f.caption:SetText(key)
+		f.caption:SetPoint('TOPLEFT')
+
+		f.setting = f:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
+		f.setting:SetText('Mode: ButtonSize ('..PredatorButtonsSettings[key].buttonSize..')')
+		f.setting:SetPoint('TOPLEFT', f.caption, 'BOTTOMLEFT', 5, -5)
+
+		f.key = key
+		f.mode = 'buttonSize'
+
+		f:SetScript('OnMouseUp', function(self, btn)
+			-- lib.debugging(self.key..', '..self.mode)
+			if (btn ~= 'LeftButton') then return end
+			if (self.mode == 'buttonSize') then
+				self.setting:SetText('Mode: Padding ('..PredatorButtonsSettings[self.key].padding..')')
+				self.mode = 'padding'
+			elseif (self.mode == 'padding') then
+				self.setting:SetText('Mode: Move')
+				self:SetMovable(true)
+				self:RegisterForDrag('LeftButton')
+				self.mode = 'move'
+			elseif (self.mode == 'move') then
+				self.setting:SetText('Mode: ButtonSize ('..PredatorButtonsSettings[self.key].buttonSize..')')
+				self:SetMovable(false)
+				self:RegisterForDrag()
+				self.mode = 'buttonSize'
+			end
+		end)
+
+		f:SetScript('OnMouseWheel', function(self, delta)
+			-- lib.debugging(self.key)
+			local tmp
+			if (self.mode == 'buttonSize') then
+				tmp = PredatorButtonsSettings[self.key].buttonSize
+				if (delta > 0) then
+					tmp = tmp + 1
+					PredatorButtonsSettings[self.key].buttonSize = tmp
+				else
+					tmp = tmp - 1
+					if (tmp > 0) then
+						PredatorButtonsSettings[self.key].buttonSize = tmp
+					end
+				end
+				self.setting:SetText('Mode: ButtonSize ('..PredatorButtonsSettings[self.key].buttonSize..')')
+			elseif (self.mode == 'padding') then
+				tmp = PredatorButtonsSettings[self.key].padding
+				if (delta > 0) then
+					tmp = tmp + 1
+				else
+					tmp = tmp - 1
+				end
+				PredatorButtonsSettings[self.key].padding = tmp
+				self.setting:SetText('Mode: Padding ('..PredatorButtonsSettings[self.key].padding..')')
+			end
+			-- lib.HandleButtonBar(_G[settings.static.BarName[self.key]], self.key, PredatorButtonsSettings[self.key].buttonSize, PredatorButtonsSettings[self.key].buttonSize)
+
+			local parent = _G[settings.static.BarName[self.key]]
+			lib.MoveTotemButton(_G['MultiCastSummonSpellButton'], parent, 1)
+			lib.MoveTotemButton(_G['MultiCastSlotButton1'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton1'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton5'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton9'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastSlotButton2'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton2'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton6'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton10'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastSlotButton3'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton3'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton7'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton11'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastSlotButton4'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton4'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton8'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton12'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastRecallSpellButton'], parent, 6)
+
+			self:ClearAllPoints()
+			self:SetPoint('TOPLEFT', _G[settings.static.BarName[self.key]])
+			self:SetSize(
+				min(PredatorButtonsSettings[self.key].buttons, PredatorButtonsSettings[self.key].columns)*(PredatorButtonsSettings[self.key].buttonSize+(2*PredatorButtonsSettings[self.key].padding)),
+				ceil(PredatorButtonsSettings[self.key].buttons/PredatorButtonsSettings[self.key].columns)*(PredatorButtonsSettings[self.key].buttonSize+(2*PredatorButtonsSettings[self.key].padding))
+			)
+			_G[settings.static.BarName[self.key]]:SetSize(
+				min(PredatorButtonsSettings[self.key].buttons, PredatorButtonsSettings[self.key].columns)*(PredatorButtonsSettings[self.key].buttonSize+(2*PredatorButtonsSettings[self.key].padding)),
+				ceil(PredatorButtonsSettings[self.key].buttons/PredatorButtonsSettings[self.key].columns)*(PredatorButtonsSettings[self.key].buttonSize+(2*PredatorButtonsSettings[self.key].padding))
+			)
+			self.tex:SetAllPoints(self)
+		end)
+
+		f:SetScript('OnDragStart', function(self)
+			self:ClearAllPoints()
+			self:StartMoving()
+		end)
+		f:SetScript('OnDragStop', function(self)
+			self:StopMovingOrSizing()
+			local point, _, relPoint, x, y = self:GetPoint(1)
+			_G[settings.static.BarName[self.key]]:ClearAllPoints()
+			_G[settings.static.BarName[self.key]]:SetPoint(point, UIParent, relPoint, x, y)
+			PredatorButtonsSettings[self.key].position = {point, x, y}
+			-- _G[settings.static.BarName[self.key]]:SetAllPoints(self)
+			-- lib.HandleButtonBar(_G[settings.static.BarName[self.key]], self.key, PredatorButtonsSettings[self.key].buttonSize, PredatorButtonsSettings[self.key].buttonSize)
+			local parent = _G[settings.static.BarName[self.key]]
+			lib.MoveTotemButton(_G['MultiCastSummonSpellButton'], parent, 1)
+			lib.MoveTotemButton(_G['MultiCastSlotButton1'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton1'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton5'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastActionButton9'], parent, 2)
+			lib.MoveTotemButton(_G['MultiCastSlotButton2'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton2'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton6'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastActionButton10'], parent, 3)
+			lib.MoveTotemButton(_G['MultiCastSlotButton3'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton3'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton7'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastActionButton11'], parent, 4)
+			lib.MoveTotemButton(_G['MultiCastSlotButton4'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton4'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton8'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastActionButton12'], parent, 5)
+			lib.MoveTotemButton(_G['MultiCastRecallSpellButton'], parent, 6)
+		end)
+
+		return f
+	end
+
 -- ########################################################################################################
 
 	--[[
@@ -349,6 +492,18 @@ local settings = ns.settings
 
 	end
 
+	--[[
+	
+	]]
+	lib.StyleTotemSlotButton = function(button)
+
+		button.overlayTex:Hide()
+
+		-- button.background:SetTexCoord()
+
+		button.overlayTex.Show = lib.noop
+	end
+
 	--[[ VOID MoveButton(BUTTON button, INT sizeX, INT sizeY, ARRAY pos)
 		Moves a button (which is in use, meaning visible) to the correct position.
 		ARRAY pos is defined as an array which holds the position information as it is used in SetPoint()
@@ -361,6 +516,18 @@ local settings = ns.settings
 		-- button:SetPoint(unpack(pos))
 		lib.buttonFuncProxy[button:GetName()..'SetPoint'](button, unpack(pos))
 
+	end
+
+	--[[
+	
+	]]
+	lib.MoveTotemButton = function(button, parent, pos)
+		lib.MoveButton(button, 
+			PredatorButtonsSettings['TotemBar'].buttonSize, PredatorButtonsSettings['TotemBar'].buttonSize,
+			{'TOPLEFT', parent, 'TOPLEFT', 
+				( ((pos-1)%PredatorButtonsSettings['TotemBar'].columns)*(PredatorButtonsSettings['TotemBar'].buttonSize+2*PredatorButtonsSettings['TotemBar'].padding)+PredatorButtonsSettings['TotemBar'].padding ),
+				-( (floor((pos-1) / PredatorButtonsSettings['TotemBar'].columns))*(PredatorButtonsSettings['TotemBar'].buttonSize+(2*PredatorButtonsSettings['TotemBar'].padding))+PredatorButtonsSettings['TotemBar'].padding )
+			} )
 	end
 
 	--[[ VOID HandleButtonBar
@@ -420,9 +587,9 @@ local settings = ns.settings
 			ceil(settings.static.NumButtons[key]/PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))
 		)
 		f:SetPoint(unpack(PredatorButtonsSettings[key].position))
-		f.tex = f:CreateTexture(nil, 'OVERLAY')
-		f.tex:SetAllPoints(f)
-		f.tex:SetTexture(1, 0, 0, 0.25)
+		-- f.tex = f:CreateTexture(nil, 'OVERLAY')
+		-- f.tex:SetAllPoints(f)
+		-- f.tex:SetTexture(1, 0, 0, 0.25)
 
 		_G['MultiCastFlyoutFrame']:SetParent(f)
 		_G['MultiCastActionPage1']:SetParent(f)
@@ -435,12 +602,7 @@ local settings = ns.settings
 		button = _G['MultiCastSummonSpellButton']
 		button:SetParent(f)
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 -- #######################################################################
 		i = 2
@@ -448,168 +610,83 @@ local settings = ns.settings
 		button:SetParent(f)
 		button.SetParent = lib.noop
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton1']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton5']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton9']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 -- #######################################################################
 		i = 3
 		button = _G['MultiCastSlotButton2']
 		button:SetParent(f)
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton2']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton6']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton10']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 -- #######################################################################
 		i = 4
 		button = _G['MultiCastSlotButton3']
 		button:SetParent(f)
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton3']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton7']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton11']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 -- #######################################################################
 		i = 5
 		button = _G['MultiCastSlotButton4']
 		button:SetParent(f)
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton4']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton8']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		button = _G['MultiCastActionButton12']
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 -- #######################################################################
 		i = 6
 		button = _G['MultiCastRecallSpellButton']
 		button:SetParent(f)
 		lib.Proxify(button)
-		lib.MoveButton(button, 
-			PredatorButtonsSettings[key].buttonSize, PredatorButtonsSettings[key].buttonSize,
-			{'TOPLEFT', f, 'TOPLEFT', 
-				( ((i-1)%PredatorButtonsSettings[key].columns)*(PredatorButtonsSettings[key].buttonSize+2*PredatorButtonsSettings[key].padding)+PredatorButtonsSettings[key].padding ),
-				-( (floor((i-1) / PredatorButtonsSettings[key].columns))*(PredatorButtonsSettings[key].buttonSize+(2*PredatorButtonsSettings[key].padding))+PredatorButtonsSettings[key].padding )
-			} )
+		lib.MoveTotemButton(button, f, i)
 
 		return f
 	end

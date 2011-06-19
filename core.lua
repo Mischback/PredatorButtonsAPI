@@ -83,8 +83,31 @@ local lib = ns.lib
 	function PredatorButtons:ApplySkin(bar)
 		local parent = _G[settings.static.BarName[bar]]
 		local i
-		for i = 1, PredatorButtonsSettings[bar].buttons do
-			lib.StyleButton(_G[settings.static.ButtonPrefix[bar]..i],
+		if ( bar ~= 'TotemBar' ) then
+			for i = 1, PredatorButtonsSettings[bar].buttons do
+				lib.StyleButton(_G[settings.static.ButtonPrefix[bar]..i],
+					skin.tex.normal, 
+					skin.tex.pushed, 
+					skin.tex.highlight, 
+					skin.tex.checked, 
+					skin.showHotKey,
+					skin.HotKeySettings,
+					skin.showCount,
+					skin.CountSettings,
+					skin.showName,
+					skin.NameSettings,
+					skin.overrideFunc)
+			end
+		else
+			lib.debugging('styling TotemBar')
+			lib.StyleTotemSlotButton(_G['MultiCastSlotButton1'])
+			lib.StyleTotemSlotButton(_G['MultiCastSlotButton2'])
+			lib.StyleTotemSlotButton(_G['MultiCastSlotButton3'])
+			lib.StyleTotemSlotButton(_G['MultiCastSlotButton4'])
+
+			_G['MultiCastSummonSpellButtonHighlight']:Hide()
+			_G['MultiCastSummonSpellButtonHighlight'].Show = lib.noop
+			lib.StyleButton(_G['MultiCastSummonSpellButton'],
 				skin.tex.normal, 
 				skin.tex.pushed, 
 				skin.tex.highlight, 
@@ -96,6 +119,38 @@ local lib = ns.lib
 				skin.showName,
 				skin.NameSettings,
 				skin.overrideFunc)
+
+			_G['MultiCastRecallSpellButtonHighlight']:Hide()
+			_G['MultiCastRecallSpellButtonHighlight'].Show = lib.noop
+			lib.StyleButton(_G['MultiCastRecallSpellButton'],
+				skin.tex.normal, 
+				skin.tex.pushed, 
+				skin.tex.highlight, 
+				skin.tex.checked, 
+				skin.showHotKey,
+				skin.HotKeySettings,
+				skin.showCount,
+				skin.CountSettings,
+				skin.showName,
+				skin.NameSettings,
+				skin.overrideFunc)
+
+			for i = 1, 12 do
+				_G['MultiCastActionButton'..i].overlayTex:Hide()
+				_G['MultiCastActionButton'..i].overlayTex.Show = lib.noop
+				lib.StyleButton(_G['MultiCastActionButton'..i],
+					skin.tex.normal, 
+					skin.tex.pushed, 
+					skin.tex.highlight, 
+					skin.tex.checked, 
+					skin.showHotKey,
+					skin.HotKeySettings,
+					skin.showCount,
+					skin.CountSettings,
+					skin.showName,
+					skin.NameSettings,
+					skin.overrideFunc)
+			end
 		end
 	end
 
